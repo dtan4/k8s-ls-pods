@@ -11,12 +11,13 @@ import (
 
 func main() {
 	var (
-		kubeContext string
-		inCluster   bool
-		kubeconfig  string
-		labels      string
-		namespace   string
-		verbose     bool
+		allNamespaces bool
+		kubeContext   string
+		inCluster     bool
+		kubeconfig    string
+		labels        string
+		namespace     string
+		verbose       bool
 	)
 
 	flags := flag.NewFlagSet("k8s-pod-notifier", flag.ExitOnError)
@@ -24,6 +25,7 @@ func main() {
 		flags.PrintDefaults()
 	}
 
+	flags.BoolVar(&allNamespaces, "all-namespaces", false, "List pods across all namespaces")
 	flags.StringVar(&kubeContext, "context", "", "Kubernetes context")
 	flags.BoolVar(&inCluster, "in-cluster", false, "Execute in Kubernetes cluster")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path of kubeconfig")
@@ -54,7 +56,11 @@ func main() {
 		}
 
 		if namespace == "" {
-			namespace = k8s.DefaultNamespace()
+			if allNamespaces {
+				namespace = k8s.AllNamespaces()
+			} else {
+				namespace = k8s.DefaultNamespace()
+			}
 		}
 
 		k8sClient = c
@@ -73,7 +79,11 @@ func main() {
 			}
 
 			if namespaceInConfig == "" {
-				namespace = k8s.DefaultNamespace()
+				if allNamespaces {
+					namespace = k8s.AllNamespaces()
+				} else {
+					namespace = k8s.DefaultNamespace()
+				}
 			} else {
 				namespace = namespaceInConfig
 			}
