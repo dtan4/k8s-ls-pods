@@ -101,6 +101,7 @@ func main() {
 	if verbose {
 		for _, pod := range pods {
 			pp.Println(pod)
+			fmt.Println("-----")
 		}
 	} else {
 		for _, pod := range pods {
