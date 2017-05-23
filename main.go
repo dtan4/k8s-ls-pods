@@ -44,16 +44,14 @@ func main() {
 		}
 	}
 
-	var k8sClient *k8s.Client
-
-	c, err := k8s.NewClient(kubeconfig, kubeContext)
+	k8sClient, err := k8s.NewClient(kubeconfig, kubeContext)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	if namespace == "" {
-		namespaceInConfig, err := c.NamespaceInConfig()
+		namespaceInConfig, err := k8sClient.NamespaceInConfig()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -68,8 +66,6 @@ func main() {
 		} else {
 			namespace = namespaceInConfig
 		}
-
-		k8sClient = c
 	}
 
 	pods, err := k8sClient.ListPods(namespace, labels)
