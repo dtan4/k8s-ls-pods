@@ -1,5 +1,5 @@
-hash: 5425af324103d2b29368de33a4b642c6a3f42840eee5b586e28c8703d1a8545e
-updated: 2017-05-23T15:28:42.611015424+09:00
+hash: a91c4cb51c2f4819c9a882f1c32e9d1a1b8cf016899358c4b05551b11d4b0ed7
+updated: 2017-05-23T16:00:29.38077165+09:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -75,6 +75,10 @@ imports:
   - buffer
   - jlexer
   - jwriter
+- name: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+- name: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/pkg/errors

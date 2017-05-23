@@ -8,7 +8,6 @@ import:
   subpackages:
   - kubernetes
   - pkg/api/v1
-  - rest
   - tools/clientcmd
 - package: github.com/k0kubun/pp
   version: ~2.3.0
