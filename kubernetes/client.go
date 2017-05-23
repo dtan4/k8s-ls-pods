@@ -69,7 +69,9 @@ func (c *Client) NamespaceInConfig() (string, error) {
 
 // ListPods lists Pods
 func (c *Client) ListPods(namespace, labels string) ([]v1.Pod, error) {
-	pods, err := c.clientset.Core().Pods(namespace).List(v1.ListOptions{})
+	pods, err := c.clientset.Core().Pods(namespace).List(v1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return []v1.Pod{}, errors.Wrap(err, "failed to list Pods")
 	}
