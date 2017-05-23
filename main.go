@@ -13,7 +13,6 @@ func main() {
 	var (
 		allNamespaces bool
 		kubeContext   string
-		inCluster     bool
 		kubeconfig    string
 		labels        string
 		namespace     string
@@ -27,7 +26,6 @@ func main() {
 
 	flags.BoolVar(&allNamespaces, "all-namespaces", false, "List pods across all namespaces")
 	flags.StringVar(&kubeContext, "context", "", "Kubernetes context")
-	flags.BoolVar(&inCluster, "in-cluster", false, "Execute in Kubernetes cluster")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVarP(&labels, "labels", "l", "", "Label filter query")
 	flags.StringVarP(&namespace, "namespace", "n", "", "Kubernetes namespace")
@@ -48,45 +46,27 @@ func main() {
 
 	var k8sClient *k8s.Client
 
-	if inCluster {
-		c, err := k8s.NewClientInCluster()
+	c, err := k8s.NewClient(kubeconfig, kubeContext)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	if namespace == "" {
+		namespaceInConfig, err := c.NamespaceInConfig()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
-		if namespace == "" {
+		if namespaceInConfig == "" {
 			if allNamespaces {
 				namespace = k8s.AllNamespaces()
 			} else {
 				namespace = k8s.DefaultNamespace()
 			}
-		}
-
-		k8sClient = c
-	} else {
-		c, err := k8s.NewClient(kubeconfig, kubeContext)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-
-		if namespace == "" {
-			namespaceInConfig, err := c.NamespaceInConfig()
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-
-			if namespaceInConfig == "" {
-				if allNamespaces {
-					namespace = k8s.AllNamespaces()
-				} else {
-					namespace = k8s.DefaultNamespace()
-				}
-			} else {
-				namespace = namespaceInConfig
-			}
+		} else {
+			namespace = namespaceInConfig
 		}
 
 		k8sClient = c
