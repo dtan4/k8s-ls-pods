@@ -5,6 +5,7 @@ import (
 	"os"
 
 	k8s "github.com/dtan4/k8s-ls-pods/kubernetes"
+	"github.com/k0kubun/pp"
 	flag "github.com/spf13/pflag"
 )
 
@@ -15,6 +16,7 @@ func main() {
 		kubeconfig  string
 		labels      string
 		namespace   string
+		verbose     bool
 	)
 
 	flags := flag.NewFlagSet("k8s-pod-notifier", flag.ExitOnError)
@@ -27,6 +29,7 @@ func main() {
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVarP(&labels, "labels", "l", "", "Label filter query")
 	flags.StringVarP(&namespace, "namespace", "n", "", "Kubernetes namespace")
+	flags.BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -85,7 +88,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	for _, pod := range pods {
-		fmt.Println(pod.Name)
+	if verbose {
+		for _, pod := range pods {
+			pp.Println(pod)
+		}
+	} else {
+		for _, pod := range pods {
+			fmt.Println(pod.Name)
+		}
 	}
 }
