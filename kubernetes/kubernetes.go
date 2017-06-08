@@ -19,3 +19,13 @@ func DefaultConfigFile() string {
 func DefaultNamespace() string {
 	return v1.NamespaceDefault
 }
+
+// IsPodFailed returns whether the given Pod finished unsuccessfully or not
+func IsPodFailed(pod v1.Pod) bool {
+	return pod.Status.Phase == v1.PodFailed
+}
+
+// IsPodSucceeded returns whether the given Pod finished successfully or not
+func IsPodSucceeded(pod v1.Pod) bool {
+	return pod.Status.Phase == v1.PodSucceeded
+}

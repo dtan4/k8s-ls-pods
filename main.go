@@ -12,10 +12,12 @@ import (
 func main() {
 	var (
 		allNamespaces bool
+		failed        bool
 		kubeContext   string
 		kubeconfig    string
 		labels        string
 		namespace     string
+		succeeded     bool
 		verbose       bool
 	)
 
@@ -26,15 +28,19 @@ func main() {
 
 	flags.BoolVar(&allNamespaces, "all-namespaces", false, "List pods across all namespaces")
 	flags.StringVar(&kubeContext, "context", "", "Kubernetes context")
+	flags.BoolVar(&failed, "failed", false, "Show failed Pods only")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVarP(&labels, "labels", "l", "", "Label filter query")
 	flags.StringVarP(&namespace, "namespace", "n", "", "Kubernetes namespace")
+	flags.BoolVar(&succeeded, "succeeded", false, "Show succeeded Pods only")
 	flags.BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
+	printAll := !failed && !succeeded
 
 	if kubeconfig == "" {
 		if os.Getenv("KUBECONFIG") != "" {
@@ -76,11 +82,23 @@ func main() {
 
 	if verbose {
 		for _, pod := range pods {
+			if !printAll {
+				if (failed && !k8s.IsPodFailed(pod)) || (succeeded && !k8s.IsPodSucceeded(pod)) {
+					continue
+				}
+			}
+
 			pp.Println(pod)
 			fmt.Println("-----")
 		}
 	} else {
 		for _, pod := range pods {
+			if !printAll {
+				if (failed && !k8s.IsPodFailed(pod)) || (succeeded && !k8s.IsPodSucceeded(pod)) {
+					continue
+				}
+			}
+
 			fmt.Println(pod.Name)
 		}
 	}
